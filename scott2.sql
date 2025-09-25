@@ -1,0 +1,328 @@
+SELECT NAME||'''s ID:' as "ID"
+      ,ID || ', WEIGHT is' as "AND"
+      ,WEIGHT ||'Kg'
+      
+From student;
+
+SELECT NAME
+      ,TEL
+      ,SUBSTR(TEL, 0, INSTR(TEL,')')-1) AS "AREA CODE"
+FROM student
+       WHERE DEPTNO1 = 201;
+
+SELECT ENAME
+      ,REPLACE(ENAME, SUBSTR(ENAME,2,2),  '--')
+FROM EMP
+WHERE DEPTNO = 20;
+
+SELECT *
+FROM TAB;
+
+SELECT SYSDATE
+      ,TO_CHAR(sysdate, 'rrrr/mm/dd') as "SYSTEM"
+      ,TO_CHAR(12345.6, '99,999.99') AS "NUM"
+FROM DUAL;
+
+SELECT EMPNO
+      ,ENAME
+      ,JOB
+      ,TO_CHAR(sal, '999,999') as "salary"
+FROM EMP;
+
+SELECT *
+FROM PROFESSOR
+WHERE HIREDATE BETWEEN TO_DATE('1990/01/01 09:00:00', 'RRRR/MM/DD HH24:MI:SS') AND TO_DATE('2000/01/01 00:00:00', 'RRRR/MM/DD HH24:MI:SS')
+ORDER BY HIREDATE;
+
+SELECT *
+FROM EMP
+WHERE SAL + NVL(COMM, 0) >= 2000;
+
+SELECT PROFNO
+      ,NAME
+      ,PAY
+      ,BONUS
+      ,TO_CHAR(PAY*12+NVL(BONUS, 0), '999,999') AS "TOTAL"
+FROM PROFESSOR;
+
+SELECT PROFNO
+      ,NAME
+      ,NVL2(BONUS, (PAY*12)+BONUS, (PAY*12)) AS "TOTAL"
+FROM PROFESSOR;
+
+SELECT EMPNO
+      ,ENAME
+      ,COMM
+      ,NVL2(COMM, 'EXIST' , 'NULL') AS "NVL2"
+
+FROM EMP
+WHERE DEPTNO =30;
+
+-- DECODE()--
+-- SAL > 30 ? '값1' : '값2' (3항연산자 >> 조건에 따라 값1 OR 값2 출력)
+SELECT EMPNO
+      ,ENAME
+      ,JOB
+      ,DECODE(JOB, 'SALESMAN', '영업부서', DECODE(JOB, 'MANAGER', '관리부서', '기타부서')) AS "DEPT"
+FROM EMP;
+
+SELECT NAME
+      ,JUMIN
+      ,DECODE(SUBSTR(JUMIN,7,1), 1, 'MAN', 'WOMAN') AS "GENDER"
+FROM STUDENT
+WHERE DEPTNO1 = 101;
+
+SELECT NAME
+      ,TEL
+      ,DECODE(SUBSTR(TEL,0,INSTR(TEL, ')')-1),'02','SEOUL' 
+                                              ,'055', 'GYEONGNAM'
+                                              ,'031', 'GYEONGGI'
+                                              ,'051', 'BUSAN'
+                                              ,'052', 'ULSAN' 
+                                              ,'053', 'DAEGU')AS "LOC"
+                                              
+FROM STUDENT
+WHERE DEPTNO1 = 101;
+
+SELECT NAME
+      ,TEL
+      ,CASE SUBSTR(TEL,0,INSTR(TEL, ')')-1) WHEN '02' THEN 'SEOUL'
+                                            WHEN '031' THEN 'GYEONGGI'
+                                            WHEN '032' THEN 'INCHEON'
+                                            WHEN '051' THEN 'ULSAN'
+                                            WHEN '052' THEN 'BUSAN'
+                                            WHEN '055' THEN 'GYEONGNAM'
+                                            ELSE '기타'
+       END AS "LOC"
+FROM STUDENT
+WHERE DEPTNO1 = 101;
+
+SELECT PROFNO
+      ,NAME
+      ,POSITION
+      ,CASE WHEN PAY*12 >5000 THEN 'HIGH'
+            WHEN PAY*12 >4000 THEN 'MID'
+            WHEN PAY*12 >3000 THEN 'LOW'
+            ELSE '열정페이'
+            END AS "SAL"
+      ,PAY*12
+FROM PROFESSOR
+-- WHERE 구문에 CASE 써서 END = '' 형식으로 해당 값에 해당하는 것만 볼 수 있음.
+WHERE CASE  WHEN PAY*12 >5000 THEN 'HIGH'
+            WHEN PAY*12 >4000 THEN 'MID'
+            WHEN PAY*12 >3000 THEN 'LOW'
+            ELSE '열정페이'
+            END = 'MID';
+            
+SELECT EMPNO
+      ,ENAME
+      ,SAL
+      ,CASE WHEN SAL BETWEEN 1 AND 1000 THEN 'LEVEL1'
+            WHEN SAL BETWEEN 1001 AND 2000 THEN 'LEVEL2'
+            WHEN SAL BETWEEN 2001 AND 3000 THEN 'LEVEL3'
+            WHEN SAL BETWEEN 3001 AND 4000 THEN 'LEVEL4'
+            WHEN SAL >= 4001 THEN 'LEVEL5'
+            END AS "LEVEL"
+FROM EMP
+ORDER BY SAL DESC;
+
+SELECT NAME
+      ,CASE WHEN SUBSTR(JUMIN, 3,2) BETWEEN '01' AND '03' THEN '1/4'
+      END AS "QUA"
+      
+FROM STUDENT;
+
+SELECT *
+FROM DEPARTMENT;
+
+SELECT *
+FROM STUDENT;
+
+SELECT PROFNO, NAME, 'PROFESSOR', PAY
+FROM PROFESSOR
+-- +++++++++++ --
+WHERE DEPTNO = 101
+UNION 
+
+SELECT STUDNO, NAME, 'STUDENT', 0
+FROM STUDENT
+WHERE DEPTNO1 = 101;
+----------------------
+-- 두 개의 칼럼의 개수가 같아야 UNION 할 수 있음--
+
+SELECT JOB,DEPTNO, COUNT(*)
+      
+FROM EMP
+GROUP BY JOB, DEPTNO;
+
+SELECT JOB, COUNT(*) AS "인원"
+      ,SUM(SAL)"직무 급여 합계"
+      ,ROUND(AVG(SAL)) AS "평균임금"
+      ,MAX(SAL) AS "직무별 최대임금"
+      ,MIN(SAL) AS "직무별 최소임금"
+      ,ROUND(STDDEV(SAL),2 )AS "표준편차"
+      ,ROUND(VARIANCE(SAL),2) AS "분산"
+FROM EMP
+GROUP BY JOB;
+
+SELECT TO_CHAR(HIREDATE, 'RRRR')"채용일"
+      ,COUNT(*) AS "인원" 
+FROM EMP
+GROUP BY TO_CHAR(HIREDATE, 'RRRR');
+
+--학생테이블, 학과별(DEPTNO) 인원.
+SELECT DEPTNO1 AS "학과"
+      
+      ,COUNT(*) AS "인원"
+FROM STUDENT
+GROUP BY DEPTNO1
+HAVING COUNT(*) > 2; -- 그룹의 조건을 추가하고 싶을 때는 HAVING절을 사용
+
+-- 교수, POSITION, 그룹 PAY합계, 그룹내 최고급여, 최저급여 얼마인지
+SELECT POSITION AS "직책"
+      ,COUNT(*) AS "인수"
+      ,SUM(PAY) AS "PAY합계"
+      ,MAX(PAY) AS "최고급여"
+      ,MIN(PAY) AS "최저급여"
+FROM PROFESSOR
+GROUP BY POSITION;
+
+-- EMP테이블, 부서별 평균 급여, 인원
+SELECT DEPTNO AS "부서"
+      ,ROUND(AVG(SAL), 2) AS "평균 급여"
+      ,COUNT(*) AS "인원수"
+FROM EMP
+GROUP BY DEPTNO;
+
+-- EMP테이블, 부서, 직무별 평균급여, 인원.
+SELECT DEPTNO AS "부서"
+      ,JOB AS "직무"
+      ,AVG(SAL) AS "평균급여"
+      ,COUNT(*) AS "인원수"
+FROM EMP
+GROUP BY DEPTNO, JOB
+ORDER BY JOB;
+--EMP테이블, 평균급여, 인원.
+SELECT ROUND(AVG(SAL), 2) AS "평균급여"
+      ,COUNT(*) AS "사원 수"
+FROM EMP;
+
+-- 부서, 직무, 급여, 인원
+-- 부서     ,  급여, 인원
+-- 부서, 직무, 급여, 인원
+    -- 부서,    , 급여, 인원
+--            급여, 인원
+
+
+SELECT DEPTNO, NULL, ROUND(AVG(SAL)), COUNT(*), 'a'
+FROM EMP
+GROUP BY DEPTNO
+UNION 
+SELECT DEPTNO, JOB, ROUND(AVG(SAL)), COUNT(*), 'b'
+FROM EMP
+GROUP BY DEPTNO, job
+UNION
+SELECT NULL, NULL, ROUND(AVG(SAL)), COUNT(*), 'c'
+FROM EMP
+ORDER BY 1,2;
+
+--롤 업 함수 ROLLUP()
+SELECT DECODE(NVL(DEPTNO, 999),999,'전체',DEPTNO)AS"부서"
+      ,NVL(JOB, '합계')"직무"
+      ,ROUND(AVG(SAL))"평균급여"
+      ,COUNT(*)"사원 수"
+      
+FROM EMP
+GROUP BY CUBE(DEPTNO, JOB)
+ORDER BY 1, 2;
+
+SELECT COUNT(*) FROM EMP; ---12 
+SELECT COUNT(*) FROM DEPT; ---4
+
+SELECT DEPT.*, EMP.*
+FROM EMP
+JOIN DEPT
+ON EMP.DEPTNO = DEPT.DEPTNO;
+
+SELECT  STUDNO 
+       ,S.NAME
+       ,S.GRADE 
+       ,P.NAME AS "교수이름"
+       ,S.DEPTNO1
+       ,D.DNAME AS "학과명"
+FROM STUDENT S --드라이빙 테이블 >> 레프트아우터조인
+LEFT OUTER JOIN PROFESSOR P --드리븐테이블 >> 라이트 아우터 조인
+ON S.PROFNO = P.PROFNO
+JOIN DEPARTMENT D
+ON S.DEPTNO1 = D.DEPTNO;
+
+SELECT P.PROFNO, P.NAME, S.STUDNO, S.NAME, S.PROFNO AS"담당교수" 
+FROM PROFESSOR P
+LEFT OUTER JOIN STUDENT S
+ON P.PROFNO = S.PROFNO;
+
+
+SELECT P.PROFNO, P.NAME, S.STUDNO, S.NAME, S.PROFNO AS"담당교수" 
+FROM STUDENT S
+
+RIGHT OUTER JOIN PROFESSOR P
+ON P.PROFNO = S.PROFNO;
+
+SELECT S.GRADE, E.*
+FROM EMP E
+JOIN SALGRADE S
+ON E.SAL BETWEEN S.LOSAL AND S.HISAL
+WHERE S.GRADE =2; --안씨조인
+
+--오라클조인--
+SELECT E.*, D.*
+FROM EMP E
+    ,DEPT D
+WHERE E.DEPTNO = D.DEPTNO;
+
+SELECT E1.EMPNO AS"사번"
+      ,E1.ENAME AS"사원명"
+      ,E2.EMPNO AS"관리자번호"
+      ,E2.ENAME AS"관리자이름"
+FROM EMP E1, EMP E2
+WHERE E1.MGR = E2.EMPNO(+);
+
+SELECT S.NAME AS "STU_NAME"
+      ,S.DEPTNO1 AS "DEPTNO1"
+      ,D.DNAME AS "DEPT_NAME"
+FROM STUDENT S
+JOIN DEPARTMENT D
+ON S.DEPTNO1 = D.DEPTNO;
+
+SELECT S.NAME AS "STU_NAME"
+      ,S.DEPTNO1 AS "DEPTNO1"
+      ,D.DNAME AS "DEPT_NAME"
+FROM STUDENT S, DEPARTMENT D
+
+WHERE S.DEPTNO1 = D.DEPTNO;
+
+SELECT E.NAME
+      ,E.POSITION
+      ,E.PAY
+      ,P.S_PAY
+      ,P.E_PAY
+FROM EMP2 E
+JOIN P_GRADE P
+ON P.POSITION = E.EMP_TYPE OR E.PAY BeTWEEN P.S_PAY AND P.E_PAY
+WHERE E.POSITION IS NOT NULL;
+
+SELECT E.NAME
+      ,2011 - SUBSTR(E.BIRTHDAY, 1, 4) AS "AGE"
+      ,E.POSITION AS "CURR_POSITION"
+      ,CASE WHEN(2012 - SUBSTR(E.BIRTHDAY, 1, 4))between 1 and 24 THEN 'MANAGER'
+            WHEN(2012 - SUBSTR(E.BIRTHDAY, 1, 4))between 25 and 28 THEN 'DEPUTY SECTION CHIEF'
+            WHEN(2012 - SUBSTR(E.BIRTHDAY, 1, 4))between 29 and 32 THEN 'SECTION HEAD'
+            WHEN(2012 - SUBSTR(E.BIRTHDAY, 1, 4))between 33 and 36 THEN 'DEPUTY DEPARTMENT HEAD'
+            WHEN(2012 - SUBSTR(E.BIRTHDAY, 1, 4))between 37 and 40 THEN 'DEPARTMENT HEAD'
+            WHEN(2012 - SUBSTR(E.BIRTHDAY, 1, 4))between 41 and 55 THEN 'DIRECTOR'
+            ELSE 'BOSS' END AS " BE_POSITION"
+FROM EMP2 E
+LEFT OUTER JOIN P_GRADE P
+ON P.POSITION = E.POSITION and (2013 - SUBSTR(E.EMPNO, 1, 4))between p.s_age and p.e_age
+ORDER BY AGE;
+
