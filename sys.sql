@@ -1,11 +1,12 @@
-select username from all_users;
+-- 게시판, 회원관리, 상품관리 ->
+-- 오라클서버 --- 웹서버(노드) --- 클라이언트(브라우저)(FETCH 함수)
 
-ALTER SESSION SET "_ORACLE_SCRIPT"=true;
+SELECT *
+FROM EMP;
 
- CREATE USER  scott
- IDENTIFIED BY tiger
- DEFAULT TABLESPACE users
- TEMPORARY TABLESPACE temp;
+select *
+from dba_users
+where username = 'SCOTT';
 
- GRANT CONNECT, RESOURCE, UNLIMITED TABLESPACE
- TO scott;
+ALTER USER SCOTT ACCOUNT UNLOCK;
+
